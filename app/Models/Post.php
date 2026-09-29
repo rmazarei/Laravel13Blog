@@ -2,28 +2,39 @@
 
 namespace App\Models;
 
-use Hekmatinasser\Verta\Verta;
+use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostFactory> */
+    /** @use HasFactory<PostFactory> */
     use HasFactory;
 
     protected $fillable = ['user_id', 'title', 'body', 'cover'];
 
-    public $appends = ['persian_date'];
+    public $appends = ['persian_date', 'excerpt'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function getPersianDateAttribute()
+    /*
+     * Old attribute definition
+     */
+    public function getPersianDateAttribute(): string
     {
         return verta($this->created_at)->format('d F Y');
+    }
+
+    /*
+     * New attribute definition
+     */
+    public function excerpt(): Attribute
+    {
+        return Attribute::get(fn () => Str::words($this->body, 5));
     }
 }

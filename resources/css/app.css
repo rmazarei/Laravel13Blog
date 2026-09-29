@@ -170,3 +170,10 @@
         @apply bg-background text-foreground;
     }
 }
+
+.dir-rtl {
+    direction: rtl;
+}
+.list-table {
+
+}

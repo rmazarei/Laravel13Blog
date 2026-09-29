@@ -7,7 +7,7 @@ const form = useForm({
 })
 
 function submit(){
-    form.post("/posts/store")
+    form.post("/posts")
 }
 </script>
 

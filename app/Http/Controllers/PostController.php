@@ -6,7 +6,6 @@ use App\Http\Requests\PostStoreRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -15,15 +14,37 @@ use Inertia\Response;
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource for authenticated user.
      */
     public function index()
     {
         // Collecting posts based on the authneticated user
-        $posts = Auth::user()->posts()->latest()->paginate(); // using relationship
+        $posts = Auth::user()->posts()->latest()->paginate(1); // using relationship
         // $posts = Post::where('user_id', Auth::id())->orderBy('created_at', 'DESC')->paginate();
 
         return Inertia::render('post/Index', ['posts' => $posts]);
+    }
+
+    /**
+     * Display a listing of the resource.
+     * NOTE: we can put the authenticated user methods in another controller
+     * BUT for this small project, I've used one controller.
+     */
+    public function home()
+    {
+        // Collecting all posts
+        $posts = Post::orderBy('created_at', 'DESC')->paginate(2);
+
+        return Inertia::render('Home', [
+            'posts' => $posts,
+            'debug' => [
+                'count' => $posts->count(),
+                'pepage'    => $posts->perPage(),
+                'totla' => $posts->total(),
+                'currenPage'    => $posts->currentPage(),
+                'itemsCount'    => count($posts->items())
+            ]
+            ]);
     }
 
     /**
@@ -46,7 +67,6 @@ class PostController extends Controller
             $validated['cover'] = $request->file('cover')->store('covers', 'public');
         }
 
-
         $request->user()->posts()->create($validated);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'پست جدید با موفقیت ذخیره شد.']);
@@ -60,7 +80,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return Inertia::render('post/Show', ['post'=>$post]);
     }
 
     /**
@@ -89,7 +109,6 @@ class PostController extends Controller
             // TODO: resize image if needed
             $validated['cover'] = $request->file('cover')->store('covers', 'public');
         }
-
 
         $post->update($validated);
 
