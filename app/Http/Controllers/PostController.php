@@ -7,6 +7,7 @@ use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,10 +31,14 @@ class PostController extends Controller
      * NOTE: we can put the authenticated user methods in another controller
      * BUT for this small project, I've used one controller.
      */
-    public function home()
+    public function home(Request $request)
     {
-        // Collecting all posts
-        $posts = Post::orderBy('created_at', 'DESC')->paginate(2);
+        if($request->query('query')){
+            $posts = Post::where('title', 'LIKE', '%'.$request->query('query').'%')->orderBy('created_at', 'DESC')->paginate(2);
+        } else {
+            // Collecting all posts
+            $posts = Post::orderBy('created_at', 'DESC')->paginate(2);
+        }
 
         return Inertia::render('Home', [
             'posts' => $posts,

@@ -16,6 +16,10 @@ const user = computed(() => page.props.auth.user);
             <Link href="#">تماس</Link>
             <Link href="/posts" v-if="user">پست‌ها</Link>
             <Link href="/login" v-else>ورود</Link>
+            <form class="flex flex-row-reverse gap-2 items-middle" method="get" action="/">
+                <input type="text" name="query" class="border border-gray-300 rounded">
+                <button type="submit">جستجو</button>
+            </form>
         </header>
         <article class="p-5">
             <slot />
