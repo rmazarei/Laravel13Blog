@@ -12,7 +12,6 @@ const props = defineProps({posts: Object})
 
         <SquarePen class="ml-3" />
     </Link>
-    <pre>{{ posts }}</pre>
     <table class="table table-auto border dir-rtl list-table">
         <thead>
             <tr>

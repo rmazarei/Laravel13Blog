@@ -6,8 +6,8 @@ use App\Http\Requests\PostStoreRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,7 +17,7 @@ class PostController extends Controller
     /**
      * Display a listing of the resource for authenticated user.
      */
-    public function index()
+    public function index(): Response
     {
         // Collecting posts based on the authneticated user
         $posts = Auth::user()->posts()->latest()->paginate(1); // using relationship
@@ -31,25 +31,18 @@ class PostController extends Controller
      * NOTE: we can put the authenticated user methods in another controller
      * BUT for this small project, I've used one controller.
      */
-    public function home(Request $request)
+    public function home(Request $request): Response
     {
-        if($request->query('query')){
-            $posts = Post::where('title', 'LIKE', '%'.$request->query('query').'%')->orderBy('created_at', 'DESC')->paginate(2);
+        if ($request->query('query')) {
+            $posts = Post::where('title', 'LIKE', '%'.$request->query('query').'%')->orderBy('created_at', 'DESC')->paginate(2)->withQueryString();
         } else {
             // Collecting all posts
-            $posts = Post::orderBy('created_at', 'DESC')->paginate(2);
+            $posts = Post::orderBy('created_at', 'DESC')->paginate(2)->withQueryString();
         }
 
         return Inertia::render('Home', [
             'posts' => $posts,
-            'debug' => [
-                'count' => $posts->count(),
-                'pepage'    => $posts->perPage(),
-                'totla' => $posts->total(),
-                'currenPage'    => $posts->currentPage(),
-                'itemsCount'    => count($posts->items())
-            ]
-            ]);
+        ]);
     }
 
     /**
@@ -83,15 +76,15 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show(Post $post): Response
     {
-        return Inertia::render('post/Show', ['post'=>$post]);
+        return Inertia::render('post/Show', ['post' => $post]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post)
+    public function edit(Post $post): Response
     {
         if ($post->user_id != auth()->id()) {
             // Avoid giving too much data to the user
@@ -104,7 +97,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostUpdateRequest $request, Post $post)
+    public function update(PostUpdateRequest $request, Post $post): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -125,7 +118,7 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post): RedirectResponse
     {
         if ($post->user_id != auth()->id()) {
 
